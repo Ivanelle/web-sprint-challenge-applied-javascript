@@ -1,5 +1,5 @@
 import axios from 'axios'
-const Card = (article) => {
+const Card = ({ headline, authorPhoto, authorName }) => {
   // TASK 5
   // ---------------------
   // Implement this function, which should return the markup you see below.
@@ -22,30 +22,30 @@ const Card = (article) => {
 
 
   const card = document.createElement('div');
-  const headline = document.createElement('div');
-  const author = document.createElement('div');
+  const headlineDiv = document.createElement('div');
+  const authorDiv = document.createElement('div');
   const imgContainer = document.createElement('div');
   const img = document.createElement('img');
-  const authorName = document.createElement('span');
+  const authorSpan = document.createElement('span');
   
   card.classList.add('card');
-  headline.classList.add('headline');
-  author.classList.add('author');
+  headlineDiv.classList.add('headline');
+  authorDiv.classList.add('author');
   imgContainer.classList.add('img-container');
 
-  headline.textContent = article.headline;
-  img.src = article.authorPhoto;
+  headlineDiv.textContent = headline;
+  img.src = authorPhoto;
   img.alt = 'author photo'
-  authorName.textContent = `By ${article.authorName}`
+  authorSpan.textContent = `By ${authorName}`
 
-  card.appendChild(headline);
-  card.appendChild(author);
-  author.appendChild(imgContainer);
+  card.appendChild(headlineDiv);
+  card.appendChild(authorDiv);
+  authorDiv.appendChild(imgContainer);
   imgContainer.appendChild(img);
-  author.appendChild(authorName);
+  authorDiv.appendChild(authorSpan);
 
   card.addEventListener('click', () => {
-    console.log(article.headline)
+    console.log(headline)
   })
 
   return card
@@ -63,13 +63,22 @@ const cardAppender = (selector) => {
   // Create a card from each and every article object in the response, using the Card component.
   // Append each card to the element in the DOM that matches the selector passed to the function.
   //
-
+  const elem = document.querySelector(selector)
+  
+  
   axios.get(`http://localhost:5001/api/articles`)
-  .then(resp => {
-    // console.log(resp)
-    document.querySelector(`${selector}`).appendChild(Card(resp.data.articles))
+  .then((resp) => {
+    for(const key in resp.data.articles) {
+      for (const art in resp.data.articles[key]){
+        const headline = resp.data.articles[key][art].headline
+        const authorPhoto = resp.data.articles[key][art].authorPhoto
+        const authorName = resp.data.articles[key][art].authorName
+        elem.appendChild(Card({headline, authorPhoto, authorName}))
+      }
+    }
   })
   .catch(err => console.error(err))
 }
+
 
 export { Card, cardAppender }
